@@ -3,22 +3,25 @@
     class="resume print-area bg-white mx-auto shadow-lg text-slate-900 leading-snug flex flex-col"
   >
     <div
-      class="text-center font-sans text-3xl font-bold uppercase tracking-widest"
+      class="text-center font-sans text-3xl font-bold uppercase tracking-widest editable-section"
       style="order: 1"
+      @click="$emit('sectionClick', 0)"
     >
       {{ resume.name || "Your Name" }}
     </div>
     <div
       v-if="resume.title"
-      class="text-center font-sans text-base font-semibold tracking-wider uppercase mt-1 mb-2"
+      class="text-center font-sans text-base font-semibold tracking-wider uppercase mt-1 mb-2 editable-section"
       style="order: 2"
+      @click="$emit('sectionClick', 0)"
     >
       {{ resume.title }}
     </div>
 
     <div
-      class="flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-slate-700 font-sans mb-1"
+      class="flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-slate-700 font-sans mb-1 editable-section"
       style="order: 3"
+      @click="$emit('sectionClick', 0)"
     >
       <span v-if="resume.phone">{{ resume.phone }}</span>
       <a
@@ -52,12 +55,12 @@
 
     <hr class="border-t-2 border-slate-900 my-2" style="order: 4" />
 
-    <div v-if="resume.summary" style="order: 5">
+    <div v-if="resume.summary" style="order: 5" class="editable-section" @click="$emit('sectionClick', 1)">
       <div class="section-title">Professional Summary</div>
       <div class="text-sm text-justify">{{ resume.summary }}</div>
     </div>
 
-    <div v-if="resume.exps?.length" :style="{ order: getOrder('exp') }">
+    <div v-if="resume.exps?.length" :style="{ order: getOrder('exp') }" class="editable-section" @click="$emit('sectionClick', 2)">
       <div class="section-title">Work Experience</div>
       <div v-for="(exp, index) in resume.exps" :key="index" class="mb-3">
         <div class="flex justify-between font-sans">
@@ -83,7 +86,7 @@
       </div>
     </div>
 
-    <div v-if="resume.skills?.length" :style="{ order: getOrder('skills') }">
+    <div v-if="resume.skills?.length" :style="{ order: getOrder('skills') }" class="editable-section" @click="$emit('sectionClick', 3)">
       <div class="section-title">Technical Skills</div>
       <div class="grid grid-cols-2 gap-x-5 gap-y-1 text-sm">
         <div v-for="(skill, index) in resume.skills" :key="index">
@@ -93,7 +96,7 @@
       </div>
     </div>
 
-    <div v-if="resume.achs?.length" :style="{ order: getOrder('achs') }">
+    <div v-if="resume.achs?.length" :style="{ order: getOrder('achs') }" class="editable-section" @click="$emit('sectionClick', 5)">
       <div class="section-title">Key Achievements</div>
       <ul class="list-disc pl-5">
         <li
@@ -106,7 +109,7 @@
       </ul>
     </div>
 
-    <div v-if="resume.edus?.length" :style="{ order: getOrder('edu') }">
+    <div v-if="resume.edus?.length" :style="{ order: getOrder('edu') }" class="editable-section" @click="$emit('sectionClick', 4)">
       <div class="section-title">Education</div>
       <div v-for="(edu, index) in resume.edus" :key="index" class="mb-2">
         <div class="flex justify-between font-sans">
@@ -120,7 +123,7 @@
       </div>
     </div>
 
-    <div v-if="resume.langs?.length" :style="{ order: getOrder('langs') }">
+    <div v-if="resume.langs?.length" :style="{ order: getOrder('langs') }" class="editable-section" @click="$emit('sectionClick', 6)">
       <div class="section-title">Languages</div>
       <div class="flex gap-8 text-sm">
         <div v-for="(lang, index) in resume.langs" :key="index">
@@ -133,6 +136,8 @@
 </template>
 
 <script setup>
+const emit = defineEmits(["sectionClick"]);
+
 const props = defineProps({
   resume: {
     type: Object,
@@ -169,6 +174,18 @@ const getOrder = (section) => {
   background: white;
   overflow: visible;
 }
+.editable-section {
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 4px;
+  margin-left: -8px;
+  margin-right: -8px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.editable-section:hover {
+  background-color: rgba(59, 130, 246, 0.05); /* Tailwind blue-50 opacity */
+}
 .section-title {
   font-family: Arial, sans-serif;
   font-size: 9.5pt;
@@ -187,6 +204,9 @@ const getOrder = (section) => {
     box-shadow: none;
     padding: 15mm 18mm !important;
     margin: 0 !important;
+  }
+  .editable-section:hover {
+    background-color: transparent !important;
   }
 }
 </style>

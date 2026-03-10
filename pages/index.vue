@@ -2,12 +2,12 @@
   <div class="h-screen bg-slate-100 flex flex-col font-sans overflow-hidden">
     <!-- Top Navbar -->
     <div
-      class="bg-dark text-white px-8 py-3 flex justify-between items-center z-50 shrink-0 print:hidden"
+      class="bg-dark text-white px-4 md:px-8 py-3 flex flex-col sm:flex-row justify-between items-center z-50 shrink-0 print:hidden gap-3 sm:gap-0"
     >
-      <h1 class="text-xl tracking-wide font-semibold">Resume Builder</h1>
-      <div class="flex gap-2 items-center">
+      <h1 class="text-xl tracking-wide font-semibold text-center sm:text-left w-full sm:w-auto">Resume Builder</h1>
+      <div class="flex flex-wrap gap-2 justify-center items-center w-full sm:w-auto">
         <!-- Zoom Controls -->
-        <div class="flex items-center gap-1 bg-slate-800 rounded px-2 py-1 mr-4">
+        <div class="flex items-center gap-1 bg-slate-800 rounded px-2 py-1 mr-0 sm:mr-4">
           <button class="text-white hover:bg-slate-700 w-8 h-8 rounded flex items-center justify-center font-bold text-lg" @click="zoomOut">-</button>
           <span class="text-sm font-semibold w-14 text-center select-none">{{ Math.round(zoomLevel * 100) }}%</span>
           <button class="text-white hover:bg-slate-700 w-8 h-8 rounded flex items-center justify-center font-bold text-lg" @click="zoomIn">+</button>
@@ -20,36 +20,49 @@
       </div>
     </div>
 
-    <!-- Main 3-Column Layout -->
-    <div class="flex-1 flex overflow-hidden">
+    <!-- Main Layout -->
+    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
       
       <!-- Column 1: Menu -->
-      <div class="w-64 bg-white border-r border-slate-300 flex flex-col shrink-0 overflow-y-auto print:hidden">
+      <div class="w-full lg:w-64 bg-white border-b lg:border-b-0 lg:border-r border-slate-300 flex flex-row lg:flex-col shrink-0 overflow-x-auto lg:overflow-y-auto print:hidden z-10">
         <div
           v-for="(tab, index) in tabs"
           :key="index"
-          class="px-6 py-4 cursor-pointer text-sm font-semibold border-l-4 transition-colors select-none"
+          class="px-4 py-3 lg:px-6 lg:py-4 cursor-pointer text-sm font-semibold lg:border-l-4 lg:border-b-0 border-b-4 transition-colors select-none whitespace-nowrap"
           :class="
             activeTab === index
               ? 'bg-blue-50 border-primary text-primary'
               : 'border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-800'
           "
-          @click="activeTab = index"
+          @click="activeTab = index; showMobilePreview = false"
         >
           {{ tab }}
         </div>
       </div>
 
-      <!-- Column 2: Live Preview (A4 Format) -->
-      <div class="flex-[1.5] bg-slate-300 overflow-y-auto p-4 md:p-8 flex justify-center items-start border-r border-slate-300 print:p-0 print:border-none print:bg-white print:block print:overflow-visible relative preview-container">
+      <!-- Mobile FAB (Floating Action Button) for toggling views -->
+      <div class="lg:hidden absolute bottom-6 right-6 z-50 print:hidden shadow-xl rounded-full">
+        <button @click="toggleMobilePreview" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-full font-bold shadow-lg transition-colors flex items-center gap-2">
+          <span>{{ showMobilePreview ? '✏️ Edit Data' : '📄 View Preview' }}</span>
+        </button>
+      </div>
+
+      <!-- Content Area (Columns 2 & 3) -->
+      <div class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+        
+        <!-- Column 2: Live Preview (A4 Format) -->
+        <div class="flex-[1.5] w-full lg:w-auto bg-slate-300 overflow-y-auto p-4 md:p-8 justify-center items-start lg:border-r border-slate-300 print:p-0 print:border-none print:bg-white print:block print:overflow-visible relative preview-container"
+             :class="showMobilePreview ? 'flex z-20 absolute inset-0' : 'hidden lg:flex'">
         <!-- Scale container to fit smaller screens, you can remove scale logic if you want exact A4 without zooming -->
         <div class="shadow-2xl bg-white origin-top shrink-0 print:shadow-none print:m-0 preview-page" :style="{ transform: `scale(${zoomLevel})` }">
-          <ResumeOutput :resume="resumeData" />
+          <ResumeOutput :resume="resumeData" @section-click="handleSectionClick" />
         </div>
       </div>
 
       <!-- Column 3: Form Inputs -->
-      <div class="flex-1 bg-slate-100 overflow-y-auto print:hidden" v-if="!isLoading">
+      <div class="flex-1 w-full lg:w-auto bg-slate-100 overflow-y-auto print:hidden" 
+           v-if="!isLoading" 
+           :class="showMobilePreview ? 'hidden lg:block' : 'block'">
         <div class="p-6">
           <!-- Panel 0: Personal Info -->
           <div v-show="activeTab === 0" class="panel">
@@ -280,6 +293,7 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script setup>
@@ -287,6 +301,9 @@ import { ref } from "vue";
 import draggable from "vuedraggable";
 
 const { resumeData, isLoading } = useResume();
+
+const showMobilePreview = ref(false);
+const toggleMobilePreview = () => { showMobilePreview.value = !showMobilePreview.value; };
 
 const zoomLevel = ref(1);
 const zoomIn = () => { if (zoomLevel.value < 2.0) zoomLevel.value += 0.1; };
@@ -303,6 +320,11 @@ const tabs = [
   "Languages",
 ];
 const activeTab = ref(0);
+
+const handleSectionClick = (index) => {
+  activeTab.value = index;
+  showMobilePreview.value = false;
+};
 
 const handlePrint = () => {
   window.print();

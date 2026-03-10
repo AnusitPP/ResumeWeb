@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded font-semibold text-sm transition-colors;
+  }
+  .btn-preview {
+    @apply bg-blue-600 text-white hover:bg-primary;
+  }
+  .btn-print {
+    @apply bg-white text-dark hover:bg-slate-100;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  body, html {
+    margin: 0;
+    padding: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
